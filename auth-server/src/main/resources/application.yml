@@ -1,0 +1,38 @@
+server:
+    port: 3000
+    servlet:
+        context-path: /auth-server
+
+spring:
+    profiles:
+        default: default
+    application:
+        name: auth-server
+    h2:
+        console:
+            enabled: true
+
+    datasource:
+        url: jdbc:h2:mem:users
+        username: sysadm
+        password: sysadm
+        driver-class-name: org.h2.Driver
+    #     hikari:
+    #         connection-timeout: 30000
+    #         maximum-pool-size: 10
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+    #     show-sql: false
+        hibernate:
+            ddl-auto: update
+    #     properties:
+    #         hibernate:
+    #             format_sql: true
+
+eureka:
+    instance:
+        instance-id: "${spring.application.name}:${server.port}"
+    client:
+        fetch-registry: true
+        service-url:
+            defaultZone: http://localhost:8761/eureka/
