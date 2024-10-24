@@ -1,5 +1,5 @@
 server:
-    port: 3000
+    port: 3030
     servlet:
         context-path: /auth-server
 
@@ -36,3 +36,7 @@ eureka:
         fetch-registry: true
         service-url:
             defaultZone: http://localhost:8761/eureka/
+
+aplication:
+    jwt:
+        secret: 2a8b1c2d3e7f7g7h7i7j7k7l7m7n
