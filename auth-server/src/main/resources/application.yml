@@ -6,37 +6,38 @@ server:
 spring:
     profiles:
         default: default
+    security:
+        user:
+            name: Debuggeando
+            password: ideas
+            roles: VIEWER
     application:
         name: auth-server
-    h2:
-        console:
-            enabled: true
-
     datasource:
-        url: jdbc:h2:mem:users
-        username: sysadm
-        password: sysadm
-        driver-class-name: org.h2.Driver
-    #     hikari:
-    #         connection-timeout: 30000
-    #         maximum-pool-size: 10
+        url: jdbc:postgresql://localhost:5432/authorized
+        username: postgres
+        password: postgres
+        driver-class-name: org.postgresql.Driver
+        hikari:
+            connection-timeout: 30000
+            maximum-pool-size: 10
     jpa:
-        database-platform: org.hibernate.dialect.H2Dialect
-    #     show-sql: false
+        database: postgresql
+        show-sql: false
         hibernate:
             ddl-auto: update
-    #     properties:
-    #         hibernate:
-    #             format_sql: true
+        properties:
+            hibernate:
+                format_sql: true
 
-eureka:
-    instance:
-        instance-id: "${spring.application.name}:${server.port}"
-    client:
-        fetch-registry: true
-        service-url:
-            defaultZone: http://localhost:8761/eureka/
+# eureka:
+#     instance:
+#         instance-id: "${spring.application.name}:${server.port}"
+#     client:
+#         fetch-registry: true
+#         service-url:
+#             defaultZone: http://localhost:8761/eureka/
 
-aplication:
+application:
     jwt:
         secret: 2a8b1c2d3e7f7g7h7i7j7k7l7m7n

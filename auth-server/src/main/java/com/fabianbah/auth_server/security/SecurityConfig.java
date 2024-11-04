@@ -1,5 +1,94 @@
 package com.fabianbah.auth_server.security;
 
+import java.util.List;
+
+// import javax.sql.DataSource;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+// import org.springframework.security.core.userdetails.User;
+// import org.springframework.security.core.userdetails.UserDetails;
+// import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+// import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+@Configuration
 public class SecurityConfig {
 
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        var requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName("_csrf");
+
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(
+                "/loans/**", "/balance/**", "/accounts/**", "/cards/**").authenticated()
+                .anyRequest().permitAll())
+                .formLogin(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults());
+
+        http.cors(cors -> corsConfigurationSource());
+        http.csrf(csrf -> csrf
+            .csrfTokenRequestHandler(requestHandler)
+            .ignoringRequestMatchers("/welcome","/aboutUs")
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
+
+        return http.build();
+    };
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource(){
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:3000", "https://myweb.com"));
+        config.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT", "PATCH"));
+        config.setAllowedHeaders(List.of("*"));
+
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
+    }
+
+    // @Bean
+    // InMemoryUserDetailsManager inMemoryUserDetailsManager(){
+    // UserDetails admin = User
+    // .withUsername("fabian")
+    // .password("admin")
+    // .authorities("ADMIN")
+    // .build();
+
+    // UserDetails user = User
+    // .withUsername("lucas")
+    // .password("user")
+    // .authorities("USER")
+    // .build();
+
+    // return new InMemoryUserDetailsManager( admin, user );
+    // };
+
+    // @Bean
+    // UserDetailsService userDetailsService(DataSource dataSource) {
+    //     return new JdbcUserDetailsManager(dataSource);
+    // }
+
+    @Bean
+    PasswordEncoder passwordEncoder(){
+        return NoOpPasswordEncoder.getInstance();
+        // return new BCryptPasswordEncoder();
+    }
 }

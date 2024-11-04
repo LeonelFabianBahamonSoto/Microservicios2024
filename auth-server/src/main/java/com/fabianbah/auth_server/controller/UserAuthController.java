@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fabianbah.auth_server.Services.UserAuthService;
-import com.fabianbah.auth_server.dtos.TokenDto;
-import com.fabianbah.auth_server.dtos.UserAuthDto;
+// import com.fabianbah.auth_server.Services.UserAuthService;
+// import com.fabianbah.auth_server.dtos.TokenDto;
+// import com.fabianbah.auth_server.dtos.UserAuthDto;
 import org.springframework.web.bind.annotation.PostMapping;
 
 
@@ -18,23 +18,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequestMapping(path="auth")
 @RestController
 public class UserAuthController {
-    private UserAuthService userAuthService;
+    // private UserAuthService userAuthService;
 
-    @PostMapping(path="login")
-    public ResponseEntity<TokenDto> jwtCreate( @RequestBody UserAuthDto userAuthDto ){
+    // @PostMapping(path="login")
+    // public ResponseEntity<TokenDto> jwtCreate( @RequestBody UserAuthDto userAuthDto ){
 
-        TokenDto tokenDto = this.userAuthService.login( userAuthDto );
+    //     TokenDto tokenDto = this.userAuthService.login( userAuthDto );
 
-        return new ResponseEntity<>( tokenDto, HttpStatus.OK );
-    };
+    //     return new ResponseEntity<>( tokenDto, HttpStatus.OK );
+    // };
 
-    @PostMapping(path="jwt")
-    public ResponseEntity<TokenDto> jwtValidate( @RequestHeader String accessToken ){
+    // @PostMapping(path="jwt")
+    // public ResponseEntity<TokenDto> jwtValidate( @RequestHeader String accessToken ){
 
-        TokenDto tokenDto = this.userAuthService.validateToken(
-            TokenDto.builder().accessToken(accessToken).build()
-        );
+    //     TokenDto tokenDto = this.userAuthService.validateToken(
+    //         TokenDto.builder().accessToken(accessToken).build()
+    //     );
 
-        return new ResponseEntity<>( tokenDto, HttpStatus.OK );
-    }
+    //     return new ResponseEntity<>( tokenDto, HttpStatus.OK );
+    // }
 }
