@@ -19,7 +19,7 @@ public class CsrfCookieFilter extends OncePerRequestFilter {
 
         var csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
 
-        if(Objects.nonNull(csrfToken.getHeaderName())){
+        if (Objects.nonNull(csrfToken.getHeaderName())) {
             response.setHeader(csrfToken.getHeaderName(), csrfToken.getToken());
         };
 

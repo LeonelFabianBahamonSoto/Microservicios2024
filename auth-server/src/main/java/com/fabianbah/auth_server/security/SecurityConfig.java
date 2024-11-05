@@ -2,17 +2,10 @@ package com.fabianbah.auth_server.security;
 
 import java.util.List;
 
-// import javax.sql.DataSource;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-// import org.springframework.security.core.userdetails.User;
-// import org.springframework.security.core.userdetails.UserDetails;
-// import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 // import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -34,24 +27,29 @@ public class SecurityConfig {
         var requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
 
-        http.authorizeHttpRequests(auth -> auth.requestMatchers(
-                "/loans/**", "/balance/**", "/accounts/**", "/cards/**").authenticated()
+        http.authorizeHttpRequests(auth -> auth
+                // .requestMatchers("/loans/**", "/balance/**", "/accounts/**",
+                // "/cards/**").authenticated()
+                .requestMatchers("/loans").hasAuthority("VIEW_LOANS")
+                .requestMatchers("/balance").hasAuthority("VIEW_BALANCE")
+                .requestMatchers("/accounts").hasAuthority("VIEW_ACCOUNT")
+                .requestMatchers("/cards").hasAnyAuthority("VIEW_CARDS", "VIEW_ACCOUNT")
                 .anyRequest().permitAll())
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());
 
         http.cors(cors -> corsConfigurationSource());
         http.csrf(csrf -> csrf
-            .csrfTokenRequestHandler(requestHandler)
-            .ignoringRequestMatchers("/welcome","/aboutUs")
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-            .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
+                .csrfTokenRequestHandler(requestHandler)
+                .ignoringRequestMatchers("/welcome", "/aboutUs")
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
 
         return http.build();
     };
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource(){
+    CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:3000", "https://myweb.com"));
@@ -62,6 +60,12 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
 
         return source;
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+        // return new BCryptPasswordEncoder();
     }
 
     // @Bean
@@ -83,12 +87,6 @@ public class SecurityConfig {
 
     // @Bean
     // UserDetailsService userDetailsService(DataSource dataSource) {
-    //     return new JdbcUserDetailsManager(dataSource);
+    // return new JdbcUserDetailsManager(dataSource);
     // }
-
-    @Bean
-    PasswordEncoder passwordEncoder(){
-        return NoOpPasswordEncoder.getInstance();
-        // return new BCryptPasswordEncoder();
-    }
 }
