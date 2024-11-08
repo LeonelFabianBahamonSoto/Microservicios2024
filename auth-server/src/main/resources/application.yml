@@ -40,4 +40,5 @@ spring:
 
 application:
     jwt:
-        secret: 2a8b1c2d3e7f7g7h7i7j7k7l7m7n
+        secret: 2a8b1c2d3e7f7g7h7i7j7k7l7m7n8o9p0q1r2s3t4u5v6
+        expiration-in-ms: 30000
