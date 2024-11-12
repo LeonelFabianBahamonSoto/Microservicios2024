@@ -20,22 +20,20 @@ import lombok.AllArgsConstructor;
 @Service
 @Transactional
 public class CustomerUserDetails implements UserDetailsService {
-
     private final CustomerRepository customerRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         return this.customerRepository.findByEmail(email)
-            .map(customer -> {
-                List<GrantedAuthority> authorities = customer.getRoles()
-                    .stream()
-                    .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
-                    .collect(Collectors.toList());
+                .map(customer -> {
+                    List<GrantedAuthority> authorities = customer.getRoles()
+                            .stream()
+                            .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
+                            .collect(Collectors.toList());
 
-                return new User(customer.getEmail(), customer.getPassword(), authorities);
-            })
-            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                    return new User(customer.getEmail(), customer.getPassword(), authorities);
+                })
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
-
 }
