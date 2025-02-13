@@ -6,9 +6,16 @@ import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.fabianbah.auth_server.exception.BusinessException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -23,7 +30,7 @@ public class JwtService {
     private Long JWT_EXPIRATION_IN_MS;
 
     private Claims getAllClaimsFromToken(String token) {
-        final var key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
+        final var key = getSecretKey();
 
         return Jwts
                 .parserBuilder()
@@ -60,7 +67,7 @@ public class JwtService {
     }
 
     private String getToken(Map<String, Object> claims, String subject) {
-        final var key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
+        final var key = getSecretKey();
 
         return Jwts
                 .builder()
@@ -73,9 +80,17 @@ public class JwtService {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String usernameFromUserDetails = userDetails.getUsername();
-        final String usernameFromJwt = this.getUsernameFromToken(token);
+        try {
+            final String usernameFromUserDetails = userDetails.getUsername();
+            final String usernameFromJwt = this.getUsernameFromToken(token);
 
-        return (usernameFromUserDetails.equals(usernameFromJwt)) && !this.isTokenExpired(token);
+            return (usernameFromUserDetails.equals(usernameFromJwt)) && !this.isTokenExpired(token);
+        } catch (Exception e) {
+            throw new BusinessException("Expired JWT", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    private SecretKey getSecretKey(){
+        return Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
     }
 }
