@@ -1,6 +1,9 @@
 package com.fabianbah.auth_server.entities;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,11 +26,15 @@ public class Role implements Serializable {
     @Column(name = "rolesid")
     private Long rolesId;
 
-    @Column(name = "rolename")
+    @Column(name = "rolesname")
     private String roleName;
 
-    @Column(name = "roledescription")
+    @Column(name = "rolesdescription")
     private String roleDescription;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @Column(name = "creationdate")
+    private LocalDate creationDate;
 
     // // @ManyToOne
     // // @JoinColumn(name = "customerid")

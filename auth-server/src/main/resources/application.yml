@@ -14,7 +14,7 @@ spring:
     application:
         name: auth-server
     datasource:
-        url: jdbc:postgresql://localhost:5432/authorized
+        url: jdbc:postgresql://localhost:5432/authdb
         username: postgres
         password: postgres
         driver-class-name: org.postgresql.Driver
@@ -29,6 +29,16 @@ spring:
         properties:
             hibernate:
                 format_sql: true
+
+logging:
+    level:
+        org:
+            springframework:
+                orm:
+                    jpa: DEBUG
+                transaction: DEBUG
+            hibernate:
+                sql: DEBUG
 
 # eureka:
 #     instance:

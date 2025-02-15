@@ -18,9 +18,9 @@ import com.fabianbah.auth_server.services.JwtService;
 
 import lombok.AllArgsConstructor;
 
-@RestController
-@RequestMapping(path = "/auth")
 @AllArgsConstructor
+@RequestMapping(path = "/auth")
+@RestController
 public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
 
