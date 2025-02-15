@@ -10,7 +10,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 // import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 // import org.springframework.security.provisioning.JdbcUserDetailsManager;
@@ -42,7 +43,9 @@ public class SecurityConfig {
                 .requestMatchers("/loans").hasAuthority("VIEW_LOANS")
                 .requestMatchers("/balance").hasAuthority("VIEW_BALANCE")
                 .requestMatchers("/accounts").hasAuthority("VIEW_ACCOUNT")
+                .requestMatchers("/users/**").hasAuthority("VIEW_ACCOUNT")
                 .requestMatchers("/cards").hasAnyAuthority("VIEW_CARDS", "VIEW_ACCOUNT")
+                .requestMatchers("/users/createUser").permitAll()
                 .anyRequest().permitAll())
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());
@@ -51,7 +54,7 @@ public class SecurityConfig {
         http.cors(cors -> corsConfigurationSource());
         http.csrf(csrf -> csrf
                 .csrfTokenRequestHandler(requestHandler)
-                .ignoringRequestMatchers("/welcome", "/aboutUs", "/auth/authenticate")
+                .ignoringRequestMatchers("/users/createUser", "/welcome", "/aboutUs", "/auth/authenticate")
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
 
@@ -74,8 +77,8 @@ public class SecurityConfig {
 
     @Bean
     PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-        // return new BCryptPasswordEncoder();
+        // return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean

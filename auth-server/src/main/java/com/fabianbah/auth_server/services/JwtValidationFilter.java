@@ -3,15 +3,17 @@ package com.fabianbah.auth_server.services;
 import java.io.IOException;
 import java.util.Objects;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.fabianbah.auth_server.exception.JwtAuthenticationException;
 import com.fabianbah.auth_server.security.JwtUserDetailsService;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,9 +45,9 @@ public class JwtValidationFilter extends OncePerRequestFilter {
             try {
                 userName = jwtService.getUsernameFromToken(jwt);
             } catch (IllegalArgumentException e) {
-                log.info("IllegalArgumentException Error: " + e.getMessage());
-            } catch (ExpiredJwtException e) {
-                log.info("ExpiredJwtException Error: " + e.getMessage());
+                throw new JwtAuthenticationException("Wrong Arguments", HttpStatus.UNAUTHORIZED);
+            } catch (RuntimeException e) {
+                throw new JwtAuthenticationException("Expired JWT token", HttpStatus.UNAUTHORIZED);
             }
 
             if (Objects.nonNull(userName) && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())) {

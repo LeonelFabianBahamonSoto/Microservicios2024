@@ -32,13 +32,7 @@ public class UserController {
     @PostMapping("/newUser")
     ResponseEntity<User> createNewUser( @RequestBody UserPasswordDto userAndPassword ){
         User newUser = userService.createUser(userAndPassword);
-
-        Password newPassword = new Password();
-        newPassword.setPassword(userAndPassword.getPassword());
-        newPassword.setCreationDate( newUser.getCreationDate() );
-        newPassword.setUser(newUser);
-
-        passwordService.createPassword(newPassword);
+        passwordService.createPassword( userAndPassword.getPassword(), newUser );
 
         return new ResponseEntity<>( newUser, HttpStatus.CREATED );
     };
