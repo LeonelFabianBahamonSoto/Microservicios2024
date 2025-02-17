@@ -43,9 +43,9 @@ public class SecurityConfig {
                 .requestMatchers("/loans").hasAuthority("VIEW_LOANS")
                 .requestMatchers("/balance").hasAuthority("VIEW_BALANCE")
                 .requestMatchers("/accounts").hasAuthority("VIEW_ACCOUNT")
-                .requestMatchers("/users/**").hasAuthority("VIEW_ACCOUNT")
-                .requestMatchers("/cards").hasAnyAuthority("VIEW_CARDS", "VIEW_ACCOUNT")
+                .requestMatchers("/users").hasAuthority("VIEW_ACCOUNT")
                 .requestMatchers("/users/createUser").permitAll()
+                .requestMatchers("/cards").hasAnyAuthority("VIEW_CARDS", "VIEW_ACCOUNT")
                 .anyRequest().permitAll())
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());
@@ -54,7 +54,7 @@ public class SecurityConfig {
         http.cors(cors -> corsConfigurationSource());
         http.csrf(csrf -> csrf
                 .csrfTokenRequestHandler(requestHandler)
-                .ignoringRequestMatchers("/users/createUser", "/welcome", "/aboutUs", "/auth/authenticate")
+                .ignoringRequestMatchers("/welcome", "/aboutUs", "/auth/authenticate", "/auth/validateTokenAuth")
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
 
@@ -65,9 +65,16 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
+        // Permite orígenes específicos (asegúrate de que coincidan exactamente)
         config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:3000", "https://myweb.com"));
-        config.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT", "PATCH"));
+        // Permitir todas las cabeceras
         config.setAllowedHeaders(List.of("*"));
+        // Permitir todas las credenciales (necesario si envías cookies o tokens)
+        config.setAllowCredentials(true);
+        // Métodos permitidos
+        config.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
+        // Explicita los headers expuestos si los necesitas (ejemplo: `Authorization`)
+        // config.setExposedHeaders(List.of("Authorization"));
 
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

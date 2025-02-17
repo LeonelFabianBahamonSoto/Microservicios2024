@@ -52,6 +52,13 @@ public class AuthenticationFilter implements GatewayFilter {
             .uri(AUTH_VALIDATE_URI)
             .header(ACCESS_TOKEN_HEADER_NAME,token)
             .retrieve()
+            .onStatus(
+                response -> response.isError(),
+                response -> response.bodyToMono(String.class)
+                    .flatMap(errorBody ->
+                        Mono.error(new RuntimeException("Error with the gateway authorization: " + errorBody))
+                    )
+            )
             .bodyToMono(TokenDto.class)
             .map(response -> exchange)
             .flatMap(chain::filter);

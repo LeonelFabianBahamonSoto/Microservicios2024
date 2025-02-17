@@ -38,17 +38,24 @@ public class GatewayBeans {
     @Profile( value = "eureka-on" )
     RouteLocator routeLocatorEurekaOn( RouteLocatorBuilder routeLocatorBuilder )
     {
-        return routeLocatorBuilder
-                .routes()
+        return routeLocatorBuilder.routes()
+                .route(
+                    route -> route
+                        .path("/auth-server/auth/authenticate")
+                        .uri("lb://authorization-server")
+                )
+                .route(
+                    route -> route
+                        .path("/auth-server/**")
+                        .filters( filter -> filter.filter(this.authenticationFilter))
+                        .uri("lb://authorization-server")
+                )
                 .route(
                     route -> route
                         .path("/users/**")
-                        .uri("http://localhost:8080") )
-                // .route(
-                //     route -> route
-                //         .path("/report/**")
-                //         .uri("http://localhost:7070")
-                // )
+                        .filters( filter -> filter.filter(this.authenticationFilter))
+                        .uri("http://localhost:8080")
+                )
             .build();
     }
 

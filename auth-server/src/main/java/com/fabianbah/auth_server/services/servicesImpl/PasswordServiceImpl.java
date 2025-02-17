@@ -37,7 +37,6 @@ public class PasswordServiceImpl implements PasswordService {
 
         Password newPassword = new Password();
         String pwdEncoded = passwordEncoder.encode(password);
-        System.out.println("PWD: " + pwdEncoded);
         newPassword.setPassword(pwdEncoded);
         newPassword.setCreationDate(customer.getCreationDate());
         newPassword.setCustomer(customer);

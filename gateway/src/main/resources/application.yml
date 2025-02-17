@@ -26,5 +26,5 @@ management:
 
 security:
     auth-server:
-        url: "http://localhost:3030/auth-server/auth/authenticate"
+        url: "http://localhost:3030/auth-server/auth/validateTokenAuth"
         access-token-header: "accessToken"

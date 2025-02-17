@@ -4,15 +4,10 @@ server:
         context-path: /auth-server
 
 spring:
-    profiles:
-        default: default
-    security:
-        user:
-            name: Debuggeando
-            password: ideas
-            roles: VIEWER
     application:
-        name: auth-server
+        name: authorization-server
+    profiles:
+        default: eureka-on
     datasource:
         url: jdbc:postgresql://localhost:5432/authdb
         username: postgres
@@ -40,15 +35,15 @@ logging:
             hibernate:
                 sql: DEBUG
 
-# eureka:
-#     instance:
-#         instance-id: "${spring.application.name}:${server.port}"
-#     client:
-#         fetch-registry: true
-#         service-url:
-#             defaultZone: http://localhost:8761/eureka/
+eureka:
+    instance:
+        instance-id: "${spring.application.name}:${server.port}"
+    client:
+        fetch-registry: true
+        service-url:
+            defaultZone: http://localhost:8761/eureka/
 
 application:
     jwt:
         secret: 2a8b1c2d3e7f7g7h7i7j7k7l7m7n8o9p0q1r2s3t4u5v6
-        expiration-in-ms: 300000
+        expiration-in-ms: 1200000
