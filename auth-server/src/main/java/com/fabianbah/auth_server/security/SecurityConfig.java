@@ -1,7 +1,5 @@
 package com.fabianbah.auth_server.security;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +17,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.fabianbah.auth_server.services.JwtValidationFilter;
 
@@ -30,7 +25,8 @@ public class SecurityConfig {
 
     @Autowired
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtValidationFilter jwtValidationFilter) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtValidationFilter jwtValidationFilter)
+            throws Exception {
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -51,7 +47,7 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults());
 
         http.addFilterAfter(jwtValidationFilter, BasicAuthenticationFilter.class);
-        http.cors(cors -> corsConfigurationSource());
+        // http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         http.csrf(csrf -> csrf
                 .csrfTokenRequestHandler(requestHandler)
                 .ignoringRequestMatchers("/welcome", "/aboutUs", "/auth/authenticate", "/auth/validateTokenAuth")
@@ -61,26 +57,30 @@ public class SecurityConfig {
         return http.build();
     };
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
+    // ESTE SE MANEJA EN EL GATEWAY Y NO AQUI PORQUE ENTONCES DUPLICA Y FALLA
+    // @Bean
+    // CorsConfigurationSource corsConfigurationSource() {
+    // CorsConfiguration config = new CorsConfiguration();
 
-        // Permite orígenes específicos (asegúrate de que coincidan exactamente)
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:3000", "https://myweb.com"));
-        // Permitir todas las cabeceras
-        config.setAllowedHeaders(List.of("*"));
-        // Permitir todas las credenciales (necesario si envías cookies o tokens)
-        config.setAllowCredentials(true);
-        // Métodos permitidos
-        config.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
-        // Explicita los headers expuestos si los necesitas (ejemplo: `Authorization`)
-        // config.setExposedHeaders(List.of("Authorization"));
+    // // Permite orígenes específicos (asegúrate de que coincidan exactamente)
+    // config.setAllowedOrigins(List.of("http://localhost:4200",
+    // "http://localhost:3000", "https://myweb.com"));
+    // // Permitir todas las cabeceras
+    // config.setAllowedHeaders(List.of("*"));
+    // // Permitir todas las credenciales (necesario si envías cookies o tokens)
+    // config.setAllowCredentials(true);
+    // // Métodos permitidos
+    // config.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT", "PATCH",
+    // "OPTIONS"));
+    // // Explicita los headers expuestos si los necesitas (ejemplo:
+    // `Authorization`)
+    // // config.setExposedHeaders(List.of("Authorization"));
 
-        var source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+    // var source = new UrlBasedCorsConfigurationSource();
+    // source.registerCorsConfiguration("/**", config);
 
-        return source;
-    }
+    // return source;
+    // }
 
     @Bean
     PasswordEncoder passwordEncoder() {

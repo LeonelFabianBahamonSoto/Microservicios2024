@@ -41,27 +41,25 @@ public class AuthenticationFilter implements GatewayFilter {
 
         final var chunks = tokenHeader.split(" ");
 
-        if(chunks.length != 2 || !chunks[0].equals("Bearer")){
+        if (chunks.length != 2 || !chunks[0].equals("Bearer")) {
             return this.onError(exchange);
         }
 
         final var token = chunks[1];
 
         return this.webClient
-            .post()
-            .uri(AUTH_VALIDATE_URI)
-            .header(ACCESS_TOKEN_HEADER_NAME,token)
-            .retrieve()
-            .onStatus(
-                response -> response.isError(),
-                response -> response.bodyToMono(String.class)
-                    .flatMap(errorBody ->
-                        Mono.error(new RuntimeException("Error with the gateway authorization: " + errorBody))
-                    )
-            )
-            .bodyToMono(TokenDto.class)
-            .map(response -> exchange)
-            .flatMap(chain::filter);
+                .post()
+                .uri(AUTH_VALIDATE_URI)
+                .header(ACCESS_TOKEN_HEADER_NAME, token)
+                .retrieve()
+                .onStatus(
+                        response -> response.isError(),
+                        response -> response.bodyToMono(String.class)
+                                .flatMap(errorBody -> Mono.error(
+                                        new RuntimeException("Error with the gateway authorization: " + errorBody))))
+                .bodyToMono(TokenDto.class)
+                .map(response -> exchange)
+                .flatMap(chain::filter);
     };
 
     private Mono<Void> onError(ServerWebExchange exchange) {
