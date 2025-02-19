@@ -3,6 +3,7 @@ package com.fabianbah.auth_server.security;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.fabianbah.auth_server.entities.Customer;
 import com.fabianbah.auth_server.entities.Password;
 import com.fabianbah.auth_server.entities.Role;
+import com.fabianbah.auth_server.exception.BusinessException;
 import com.fabianbah.auth_server.services.CustomerService;
 import com.fabianbah.auth_server.services.PasswordService;
 
@@ -41,25 +43,25 @@ public class AuthProvider implements AuthenticationProvider {
             Customer getCustomer = customerService.getCustomerByEmail(userEmail);
 
             if( getCustomer == null ){
-                throw new BadCredentialsException("User not found, Invalid Credentials");
+                throw new BusinessException("User not found, Invalid Credentials", HttpStatus.BAD_REQUEST);
             };
 
             currentCustomer = getCustomer;
 
         } catch (BadCredentialsException e) {
-            new BadCredentialsException("User not found, Invalid Credentials");
             e.printStackTrace();
+            throw new BusinessException("User not found, Invalid Credentials", HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            new BadCredentialsException("User not found, Invalid Credentials");
             e.printStackTrace();
+            throw new BusinessException("User not found, Invalid Credentials", HttpStatus.BAD_REQUEST);
         }
 
         Password passwordEntity = new Password();
         try {
             passwordEntity = passwordService.getPasswordByCustomerId(currentCustomer.getCustomerId());
         } catch (Exception e) {
-            new BadCredentialsException("Password not found, Invalid Credentials");
             e.printStackTrace();
+            throw new BusinessException("Password not found, Invalid Credentials", HttpStatus.BAD_REQUEST);
         }
 
         final String customerPwd = passwordEntity.getPassword();
@@ -74,7 +76,7 @@ public class AuthProvider implements AuthenticationProvider {
 
             return new UsernamePasswordAuthenticationToken(userEmail, pwd, authorities);
         } else {
-            throw new BadCredentialsException("Invalid Credentials");
+            throw new BusinessException("Invalid Credentials", HttpStatus.UNAUTHORIZED);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.fabianbah.auth_server.services.servicesImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.fabianbah.auth_server.entities.JWTRequest;
 import com.fabianbah.auth_server.entities.JwtResponse;
+import com.fabianbah.auth_server.exception.BusinessException;
 import com.fabianbah.auth_server.security.JwtUserDetailsService;
 import com.fabianbah.auth_server.services.AuthenticationService;
 import com.fabianbah.auth_server.services.JwtService;
@@ -62,7 +64,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             this.authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(), jwtRequest.getPassword()));
         } catch (BadCredentialsException | DisabledException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new BusinessException(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 

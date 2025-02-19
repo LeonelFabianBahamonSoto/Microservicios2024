@@ -2,6 +2,7 @@ package com.fabianbah.auth_server.security;
 
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 // import com.fabianbah.auth_server.entities.User;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.fabianbah.auth_server.entities.Customer;
 import com.fabianbah.auth_server.entities.Password;
+import com.fabianbah.auth_server.exception.BusinessException;
 import com.fabianbah.auth_server.services.CustomerService;
 import com.fabianbah.auth_server.services.PasswordService;
 
@@ -45,7 +47,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
             return (UserDetails) new User(customer.getEmail(), pwd, authorities);
         } catch (Exception e) {
-            throw new BadCredentialsException("Request error");
+            throw new BusinessException("Get user information Error", HttpStatus.UNAUTHORIZED);
         }
     }
 }

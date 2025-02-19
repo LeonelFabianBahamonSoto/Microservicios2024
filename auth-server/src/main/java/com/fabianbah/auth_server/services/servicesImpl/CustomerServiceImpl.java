@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fabianbah.auth_server.dtos.CustomerPasswordDto;
 import com.fabianbah.auth_server.entities.Customer;
 import com.fabianbah.auth_server.entities.Role;
+import com.fabianbah.auth_server.exception.BusinessException;
 import com.fabianbah.auth_server.repositories.CustomerRepository;
 import com.fabianbah.auth_server.services.CustomerService;
 import com.fabianbah.auth_server.services.PasswordService;
@@ -40,7 +42,7 @@ public class CustomerServiceImpl implements CustomerService {
                 customerPasswordDto.getEmail());
 
         if (isCustomer.isPresent()) {
-            throw new RuntimeException("El usuario con ese ID o email ya existe.");
+            throw new BusinessException("El usuario con ese ID o email ya existe.", HttpStatus.CONFLICT);
         }
 
         LocalDate currentDate = LocalDate.now();
@@ -74,7 +76,7 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<Customer> CustomerById = customerRepository.findByIdentificationId(CustomerIdentification);
 
         if (CustomerById.isEmpty()) {
-            throw new RuntimeException("El usuario consultado no existe");
+            throw new BusinessException("El usuario consultado no existe", HttpStatus.CONFLICT);
         }
 
         return CustomerById;
@@ -99,7 +101,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .ifPresentOrElse(
                         u -> customerRepository.deleteByIdentificationId(customerIdentification),
                         () -> {
-                            throw new RuntimeException("El usuario a eliminar no se encontro");
+                            throw new BusinessException("El usuario a eliminar no se encontro", HttpStatus.CONFLICT);
                         });
     }
 

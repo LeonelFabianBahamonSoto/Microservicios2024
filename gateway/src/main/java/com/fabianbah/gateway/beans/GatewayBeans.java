@@ -17,102 +17,106 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class GatewayBeans {
 
-    private final AuthenticationFilter authenticationFilter;
+        private final AuthenticationFilter authenticationFilter;
 
-    @Bean
-    CorsWebFilter corsWebFilter() {
-        CorsConfiguration config = new CorsConfiguration();
+        @Bean
+        CorsWebFilter corsWebFilter() {
+                CorsConfiguration config = new CorsConfiguration();
 
-        // Configuración de CORS
-        config.addAllowedOrigin("http://localhost:4200");
-        config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedOrigin("https://myweb.com");
+                // Configuración de CORS
+                config.addAllowedOrigin("http://localhost:4200");
+                config.addAllowedOrigin("http://localhost:3000");
+                config.addAllowedOrigin("https://myweb.com");
 
-        // Headers específicos en lugar de "*"
-        config.addAllowedHeader("Authorization");
-        config.addAllowedHeader("Content-Type");
-        config.addAllowedHeader("Accept");
-        config.addAllowedHeader("Origin");
-        config.addAllowedHeader("X-Requested-With");
+                // Headers específicos en lugar de "*"
+                config.addAllowedHeader("Authorization");
+                config.addAllowedHeader("Content-Type");
+                config.addAllowedHeader("Accept");
+                config.addAllowedHeader("Origin");
+                config.addAllowedHeader("X-Requested-With");
 
-        // Métodos permitidos
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("OPTIONS");
-        config.addAllowedMethod("PATCH");
+                // Métodos permitidos
+                config.addAllowedMethod("GET");
+                config.addAllowedMethod("POST");
+                config.addAllowedMethod("PUT");
+                config.addAllowedMethod("DELETE");
+                config.addAllowedMethod("OPTIONS");
+                config.addAllowedMethod("PATCH");
 
-        config.setAllowCredentials(true);
-        config.setMaxAge(3600L);
+                config.setAllowCredentials(true);
+                config.setMaxAge(3600L);
 
-        // Otras configuraciones importantes
-        config.setAllowCredentials(true);
-        config.setMaxAge(3600L);
+                // Otras configuraciones importantes
+                config.setAllowCredentials(true);
+                config.setMaxAge(3600L);
 
-        // Configuración de la fuente
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+                // Configuración de la fuente
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", config);
 
-        return new CorsWebFilter(source);
-    }
+                return new CorsWebFilter(source);
+        }
 
-    @Bean
-    @Profile(value = "eureka-off")
-    RouteLocator routeLocatorEurekaOff(RouteLocatorBuilder routeLocatorBuilder) {
-        return routeLocatorBuilder
-                .routes()
-                .route(
-                    route -> route
-                            .path("/users/**")
-                            .uri("http://localhost:8080"))
-                // .route(
-                // route -> route
-                // .path("/report/**")
-                // .uri("http://localhost:7070")
-                // )
-                .build();
-    }
+        @Bean
+        @Profile(value = "eureka-off")
+        RouteLocator routeLocatorEurekaOff(RouteLocatorBuilder routeLocatorBuilder) {
+                return routeLocatorBuilder
+                                .routes()
+                                .route(
+                                        route -> route
+                                                        .path("/users/**")
+                                                        .uri("http://localhost:8080"))
+                                // .route(
+                                // route -> route
+                                // .path("/report/**")
+                                // .uri("http://localhost:7070")
+                                // )
+                                .build();
+        }
 
-    @Bean
-    @Profile(value = "eureka-on")
-    RouteLocator routeLocatorEurekaOn(RouteLocatorBuilder routeLocatorBuilder) {
-        return routeLocatorBuilder.routes()
-                .route(
-                        route -> route
-                                .path("/auth-server/auth/authenticate")
-                                .uri("lb://authorization-server"))
-                .route(
-                        route -> route
-                                .path("/auth-server/**")
-                                .filters(filter -> filter.filter(this.authenticationFilter))
-                                .uri("lb://authorization-server"))
-                .route(
-                        route -> route
-                                .path("/users/**")
-                                .filters(filter -> filter.filter(this.authenticationFilter))
-                                .uri("http://localhost:8080"))
-                .build();
-    }
+        @Bean
+        @Profile(value = "eureka-on")
+        RouteLocator routeLocatorEurekaOn(RouteLocatorBuilder routeLocatorBuilder) {
+                return routeLocatorBuilder.routes()
+                        .route(
+                                route -> route
+                                        .path("/auth-server/auth/authenticate", "/auth-server/users/createUser")
+                                        .uri("lb://authorization-server"))
+                        .route(
+                                route -> route
+                                        .path("/auth-server/**")
+                                        .filters(filter -> filter
+                                                        .filter(this.authenticationFilter))
+                                        .uri("lb://authorization-server"))
+                        .route(
+                                route -> route
+                                        .path("/users/**")
+                                        .filters(filter -> filter
+                                                        .filter(this.authenticationFilter))
+                                        .uri("http://localhost:8080"))
+                        .build();
+        }
 
-    @Bean
-    @Profile(value = "auth")
-    RouteLocator routeLocatorAuth(RouteLocatorBuilder routeLocatorBuilder) {
-        return routeLocatorBuilder
-                .routes()
-                .route(
-                        route -> route
-                                .path("/users/**")
-                                .filters(filter -> filter.filter(this.authenticationFilter))
-                                .uri("http://localhost:8080"))
-                .route(route -> route
-                        .path("/auth-server/**")
-                        .uri("http://localhost:3030"))
-                // .route(
-                // route -> route
-                // .path("/report/**")
-                // .uri("http://localhost:7070")
-                // )
-                .build();
-    }
+        @Bean
+        @Profile(value = "auth")
+        RouteLocator routeLocatorAuth(RouteLocatorBuilder routeLocatorBuilder) {
+                return routeLocatorBuilder
+                                .routes()
+                                .route(
+                                        route -> route
+                                                .path("/users/**")
+                                                .filters(filter -> filter
+                                                                .filter(this.authenticationFilter))
+                                                .uri("http://localhost:8080"))
+                                .route(
+                                        route -> route
+                                                .path("/auth-server/**")
+                                                .uri("http://localhost:3030"))
+                                // .route(
+                                // route -> route
+                                // .path("/report/**")
+                                // .uri("http://localhost:7070")
+                                // )
+                                .build();
+        }
 }
